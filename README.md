@@ -45,7 +45,7 @@ Then open `http://localhost:5177` in Chrome or Edge, and use **Install app** (to
 - **Where it comes from.** A public feed (the one behind the Forex Factory calendar). It is unofficial, covers this week and next once published, and could change or stop. The browser cannot call it directly (no CORS, and it rate-limits), so `tools/serve.mjs` fetches it, saves `calendar.json`, and refreshes it in the background when it is older than 20 minutes (never more than once every 5 minutes, even if failing).
 - **Is it working?** The line under the news list says: `Calendar: working · updated 11:27 · 141 events · covers until Sat 16:00`. It says *not loaded*, *could not refresh (showing the last saved copy)* or *out of date* (older than 6 hours) when something is wrong. If there is no calendar, the app falls back to its old fixed 08:30 New York reminder and says so.
 - **Refresh by hand or on a schedule.** `node tools/update-calendar.mjs` refreshes once and exits with an error code if it fails.
-- **On GitHub Pages** the workflow in `.github/workflows/pages.yml` refreshes it every 30 minutes and publishes it with the site (see *Hosting* below). If the feed fails, the previous calendar is kept and the run log shows a warning.
+- **When hosted**, `api/calendar.mjs` serves `/calendar.json` live and the host caches it for 15 minutes, so the unofficial feed is asked at most about four times an hour however many people use the app. If the feed fails, the last good copy is served for up to a day.
 - **Limits.** Forecast and previous are often blank for minor events. There is no "actual" value in this feed. Times are exact to the minute, but confirm anything important on your broker's own calendar.
 
 **What was removed, and why.** After a full audit these were cut: *Session levels and killzones* (niche, discretionary and unvalidated, needed its own price feed, and touched six places); the *Key times* list (the calendar and the session board already show it, and part of it was guessed); the *Next change* row (each session row has its own countdown); and the old *Most active pairs* list under the headline, which ranked pairs differently from the Best pairs card and could disagree with it. News shows the first six events with a "Show all" button.
@@ -70,12 +70,13 @@ Then open `http://localhost:5177` in Chrome or Edge, and use **Install app** (to
 
 ## Hosting
 
-The app is a static site, published free with GitHub Pages by `.github/workflows/pages.yml`.
-- **What runs.** On every push to `main`, every 30 minutes, and on demand, the workflow runs all the tests, refreshes the calendar, and publishes only the app files (not the tests or tools). If a test fails, nothing is published.
-- **First time.** In the repository's *Settings, Pages*, the source must be **GitHub Actions**.
-- **Calendar refresh.** Scheduled workflows on a public repository are switched off by GitHub after 60 days without any repository activity. If the news panel says the calendar is out of date, open the *Actions* tab and re-enable the workflow, or push any small change.
+The app is a static site plus one small function, and is set up for Vercel (`vercel.json`).
+- **What is published.** `tools/build-site.mjs` copies only the app files into `_site/` (not the tests or tools). `vercel.json` publishes that folder and rewrites `/calendar.json` to the function `api/calendar.mjs`.
+- **Deploying.** From this folder: `vercel deploy --prod`. The first run asks you to create or link a project. Deploys are manual unless you connect the repository to the project in the host's dashboard.
+- **Any other static host** works too, but `/calendar.json` then needs a server-side source. Without one the app runs normally and the news panel says the calendar is not loaded.
+- **GitHub Pages** is not used: the calendar needs a server-side fetch, and the feed cannot be called from a browser.
 - **Privacy.** The journal, settings and any Twelve Data key are stored only in the browser on each device. The site itself holds no personal data.
-- **Third-party data.** The calendar comes from an unofficial feed and is re-published with the site. Its terms are unclear. To stop, delete the two calendar steps from the workflow, and the app falls back gracefully.
+- **Third-party data.** The calendar comes from an unofficial feed and is re-published by the function. Its terms are unclear. To stop, delete `api/calendar.mjs` and the rewrite in `vercel.json`, and the app falls back gracefully.
 
 | File | Purpose |
 | --- | --- |
@@ -86,7 +87,7 @@ The app is a static site, published free with GitHub Pages by `.github/workflows
 | `calendar.json` | The current calendar, written by those tools |
 | `glossary.js` | The 87 glossary terms. Edit here to add or reword a term |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Offline use and installation |
-| `.github/workflows/pages.yml` | Tests, calendar refresh and publishing |
+| `api/calendar.mjs`, `vercel.json`, `tools/build-site.mjs` | Hosting: the live calendar function and the site build |
 | `tools/make-icons.mjs` | Regenerates the icons: `node tools/make-icons.mjs` |
 
 To ship a change, bump `CACHE` in `sw.js` so installed copies refresh.

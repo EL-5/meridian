@@ -4,3 +4,6 @@ calendar.json.tmp
 node_modules/
 .claude/
 _site/
+.vercel/
+
+.vercel
