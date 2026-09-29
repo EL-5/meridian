@@ -70,9 +70,12 @@ h2.sect { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; colo
 .tabs::-webkit-scrollbar { display: none; }
 .tabs button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; color: var(--dim); font-weight: 600; padding: 0 var(--s2); min-height: 56px; white-space: nowrap; flex: none; }
 @media (max-width: 560px) { .tabs { gap: 2px; } .tabs button { padding: 0 9px; font-size: 15px; } }
+/* on a phone all five tabs should be visible at once, spread across the row; below about 350 px the row scrolls */
+@media (max-width: 420px) { .tabs { width: 100%; justify-content: space-between; gap: 0; } .tabs button { padding: 0 5px; font-size: 14px; } }
+@media (max-width: 340px) { .tabs button { padding: 0 3px; font-size: 13px; } }
 .tabs button:hover { color: var(--ink); }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
-.utils { display: flex; gap: var(--s1); padding-bottom: 4px; }
+.utils { display: flex; gap: var(--s1); padding-bottom: 4px; margin-left: auto; }
 .utils button { min-height: 44px; font-size: 15px; }
 
 .firstrun { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); flex-wrap: wrap;
@@ -81,7 +84,8 @@ h2.sect { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; colo
 .termdemo { border-bottom: 1px dashed var(--ink); color: var(--ink); }
 
 .grid { display: grid; grid-template-columns: 1fr; gap: var(--s5); }
-@media (min-width: 900px) { .grid { grid-template-columns: 5fr 7fr; gap: var(--s5); } }
+.grid > * { min-width: 0; }
+@media (min-width: 1000px) { .grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s5); } }
 
 /* --- clock --- */
 .clock { font: 600 56px/1.05 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
@@ -170,7 +174,8 @@ h2.sect { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; colo
 .wout li b { color: var(--ink); font-weight: 600; }
 .winrow { border: 1px solid var(--rule); padding: var(--s2); margin: var(--s2) 0 0; }
 .winrow legend { padding: 0 var(--s1); }
-.wtimes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); }
+.wtimes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s2); }
+.wtimes input { min-width: 0; width: 100%; }
 .winbtns { margin-top: var(--s2); }
 .winpresets { display: flex; flex-direction: column; align-items: flex-start; }
 .winpresets button { text-align: left; min-height: 44px; }
@@ -200,7 +205,7 @@ h2.sect { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; colo
 @media (max-width: 560px) { .ev { grid-template-columns: 4.5rem 1fr; } .ev .ec { grid-column: 2; text-align: left; } }
 
 /* --- session board --- */
-.sessions { border-top: 1px solid var(--rule); }
+.sessions { border-top: 1px solid var(--rule); container-type: inline-size; }
 .srow {
   display: grid; grid-template-columns: minmax(11rem, 1.4fr) 5rem 1.3fr 8rem; align-items: center; gap: var(--s2);
   width: 100%; min-height: 84px; padding: var(--s2) var(--s2); text-align: left; background: transparent;
@@ -217,7 +222,7 @@ h2.sect { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; colo
 .srow .win small { display: block; font-size: 13px; color: var(--faint); }
 .srow .ct { font: 600 21px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
 .srow .ct small { display: block; font: 13px var(--sans); color: var(--dim); font-weight: 400; }
-@media (max-width: 620px) {
+@container (max-width: 600px) {
   .srow { grid-template-columns: 1fr auto; row-gap: 4px; }
   .srow .win { grid-column: 1 / -1; grid-row: 2; }
   .srow .st { display: none; }
@@ -253,14 +258,19 @@ table.mv td .hint { font-family: var(--sans); font-weight: 400; margin: 2px 0 0;
 
 /* --- timeline --- */
 .timeline { margin-top: var(--s4); border-top: 1px solid var(--rule); padding-top: var(--s3); }
-.trow { display: grid; grid-template-columns: 84px 1fr; gap: var(--s1); align-items: center; margin-bottom: var(--s2); }
+.trow { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: var(--s1); align-items: center; margin-bottom: var(--s2); }
 .trow .n { font-size: 14px; color: var(--dim); }
-.tbar { position: relative; display: grid; grid-template-columns: repeat(48, 1fr); gap: 1px; height: 22px; }
+.tbar { position: relative; display: grid; grid-template-columns: repeat(48, minmax(0, 1fr)); gap: 1px; height: 22px; }
 .tbar i { background: var(--rule); }
 .tbar i.on { background: var(--ink); }
 .nowline { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--amber); pointer-events: none; }
-.ticks { display: grid; grid-template-columns: 84px 1fr; gap: var(--s1); }
-.ticks > div { display: grid; grid-template-columns: repeat(8, 1fr); font: 12px var(--mono); color: var(--dim); }
+.ticks { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: var(--s1); }
+.ticks > div { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); font: 12px var(--mono); color: var(--dim); }
+@media (max-width: 560px) {
+  .trow, .ticks { grid-template-columns: 66px minmax(0, 1fr); }
+  .ticks > div { font-size: 11px; }
+  .ticks > div span:nth-child(even) { visibility: hidden; }   /* every second hour label, so they never collide */
+}
 
 /* --- level-specific visibility --- */
 .level-experienced .only-beg { display: none !important; }
@@ -272,6 +282,15 @@ table.mv td .hint { font-family: var(--sans); font-weight: 400; margin: 2px 0 0;
 .prose h3 { margin: var(--s4) 0 var(--s1); font-size: 21px; }
 .prose p, .prose li, .prose dd { color: var(--dim); }
 .prose p b, .prose li b, .prose dt, .prose td b { color: var(--ink); }
+@media (max-width: 700px) {
+  table.mv, table.mv tbody, table.mv tr, table.mv td, table.lv, table.lv tbody, table.lv tr, table.lv td { display: block; width: 100%; }
+  table.mv thead, table.lv thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  table.mv tr, table.lv tr { padding: var(--s2) 0; border-bottom: 1px solid var(--rule); }
+  table.mv td, table.lv td { border: 0; padding: 4px 0; display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); text-align: right; }
+  table.mv td:first-child, table.lv td:first-child { display: block; text-align: left; font-size: 18px; padding-bottom: var(--s1); }
+  table.mv td[data-label]::before, table.lv td[data-label]::before { content: attr(data-label); flex: none; max-width: 48%; text-align: left; color: var(--dim); font: 14px var(--sans); }
+  table.mv td.verdict > div { text-align: right; }
+}
 table.lv { width: 100%; border-collapse: collapse; margin: var(--s2) 0; }
 table.lv th { text-align: left; font: 500 13px var(--sans); color: var(--dim); text-transform: uppercase; letter-spacing: .06em; padding: 0 var(--s2) var(--s1) 0; border-bottom: 1px solid var(--rule); }
 table.lv td { padding: var(--s2) var(--s2) var(--s2) 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--dim); }
@@ -355,10 +374,18 @@ button.danger { color: var(--down); }
 /* --- glossary --- */
 .gl { max-width: 840px; }
 .gl-controls { display: grid; gap: var(--s2); margin: var(--s3) 0; }
-@media (min-width: 720px) { .gl-controls { grid-template-columns: 1fr auto auto; align-items: center; } }
+/* the search box always gets a full row until there is really room for it beside the filters */
+@media (min-width: 640px) { .gl-controls { grid-template-columns: 1fr 1fr; align-items: center; } .gl-search { grid-column: 1 / -1; } }
+@media (min-width: 1000px) { .gl-controls { grid-template-columns: 1fr auto auto; } .gl-search { grid-column: auto; } }
 .gl-search input, .gl-cat select { width: 100%; min-height: 52px; padding: 0 var(--s2); background: var(--bg2); border: 1px solid var(--rule); border-radius: 2px; }
 .gl-search input::placeholder { color: var(--faint); }
 .gl-levels button { padding: 0 var(--s2); }
+@media (max-width: 560px) {
+  .gl-levels { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .gl-levels button { border-left: 0 !important; }
+  .gl-levels button:nth-child(even) { border-left: 1px solid var(--rule) !important; }
+  .gl-levels button:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
 .gl-start { border: 1px solid var(--rule); padding: var(--s2) var(--s3) var(--s3); margin-bottom: var(--s3); }
 .chiplist { display: flex; flex-wrap: wrap; gap: var(--s1); margin-top: var(--s2); }
 .chiplist button { min-height: 44px; padding: 0 var(--s2); }
@@ -398,7 +425,7 @@ dialog::backdrop { background: rgba(0,0,0,.65); }
 .ts-long { color: var(--dim); margin: 0 0 var(--s2); }
 .ts-ex { border-left: 3px solid var(--amber); padding-left: var(--s2); margin: var(--s2) 0; }
 .ts-actions { display: flex; gap: var(--s1); margin-top: var(--s3); }
-fieldset { border: 0; border-top: 1px solid var(--rule); margin: var(--s3) 0 0; padding: var(--s2) 0 0; }
+fieldset { border: 0; border-top: 1px solid var(--rule); margin: var(--s3) 0 0; padding: var(--s2) 0 0; min-width: 0; }
 legend { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--dim); padding: 0 var(--s1) 0 0; }
 .check { display: flex; align-items: center; gap: var(--s2); min-height: 48px; }
 .check input { width: 22px; height: 22px; accent-color: var(--ink); }

@@ -382,14 +382,14 @@
         const n = Math.abs(Math.round(net));
         const dir = n === 0 ? 'Flat' : (net > 0 ? 'Up ' : 'Down ') + n + (n === 1 ? ' pip' : ' pips');
         rows.push(`<tr><td>${sym}<div class="hint">${PAIRS[sym] || ''}</div></td>
-          <td class="${cls}">${dir}</td>
-          <td class="verdict">${cmp ? PLAIN_VERDICT[cmp.label] + `<div class="hint">Bigger range than ${cmp.smaller} of the last ${cmp.n} ${s.name} sessions at this point.</div>` : none}</td></tr>`);
+          <td class="${cls}" data-label="Since the session opened">${dir}</td>
+          <td class="verdict" data-label="Compared with usual">${cmp ? PLAIN_VERDICT[cmp.label] + `<div class="hint">Bigger range than ${cmp.smaller} of the last ${cmp.n} ${s.name} sessions at this point.</div>` : none}</td></tr>`);
       } else {
         rows.push(`<tr><td>${sym}</td>
-          <td class="num">${st.open.toFixed(dec)} → ${st.close.toFixed(dec)}</td>
-          <td class="num ${cls}">${signed(net)}</td>
-          <td class="num">${Math.round(st.range / pip)}</td>
-          <td class="verdict">${cmp ? `${cmp.label}<div class="hint">${cmp.ratio ? cmp.ratio.toFixed(2) + '× median · ' : ''}larger than ${cmp.smaller} of ${cmp.n}</div>` : none}</td></tr>`);
+          <td class="num" data-label="Open → now">${st.open.toFixed(dec)} → ${st.close.toFixed(dec)}</td>
+          <td class="num ${cls}" data-label="Net pips">${signed(net)}</td>
+          <td class="num" data-label="Range pips">${Math.round(st.range / pip)}</td>
+          <td class="verdict" data-label="Versus last ${prior.length}">${cmp ? `${cmp.label}<div class="hint">${cmp.ratio ? cmp.ratio.toFixed(2) + '× median · ' : ''}larger than ${cmp.smaller} of ${cmp.n}</div>` : none}</td></tr>`);
       }
     }
     let summary = '';
@@ -884,9 +884,9 @@
     if (!groups.length) return '';
     const rows = groups.map(g => {
       const wr = g.winRate === null ? '—' : `${g.wins} of ${g.n} · ${pctTxt(g.winRate)}` + (!beginner() && g.winInterval ? `<small>${pctTxt(g.winInterval.lo)} to ${pctTxt(g.winInterval.hi)}</small>` : '');
-      return `<tr><td>${esc(g.key)}</td><td class="num">${g.n}</td><td class="num">${wr}</td>
-        <td class="num ${g.net > 0 ? 'up' : g.net < 0 ? 'down' : ''}">${g.moneyN ? sgn(g.net) : '—'}</td>
-        <td class="num">${g.avgR === null ? '—' : sgn(g.avgR)}</td><td class="rel">${esc(g.label)}</td></tr>`;
+      return `<tr><td>${esc(g.key)}</td><td class="num" data-label="Trades">${g.n}</td><td class="num" data-label="Won">${wr}</td>
+        <td class="num ${g.net > 0 ? 'up' : g.net < 0 ? 'down' : ''}" data-label="Net ${esc(moneyCcy || '')}">${g.moneyN ? sgn(g.net) : '—'}</td>
+        <td class="num" data-label="Average R">${g.avgR === null ? '—' : sgn(g.avgR)}</td><td class="rel" data-label="Reliability">${esc(g.label)}</td></tr>`;
     }).join('');
     return `<details class="jg"${open ? ' open' : ''}><summary>${esc(title)}</summary>
       <table class="mv"><thead><tr><th>Group</th><th class="num">Trades</th><th class="num">Won</th><th class="num">Net ${esc(moneyCcy || '')}</th><th class="num">Average R</th><th>Reliability</th></tr></thead><tbody>${rows}</tbody></table></details>`;
@@ -1070,7 +1070,7 @@
   function winRowHtml(w, i) {
     const days = DAY_ORDER.map(([n, l]) => `<label class="check"><input type="checkbox" class="w-day" data-d="${n}"${w.days.includes(n) ? ' checked' : ''}> ${l}</label>`).join('');
     return `<fieldset class="winrow" data-id="${esc(w.id)}"><legend>Window ${i + 1}</legend>
-      <label class="field">Name <input type="text" class="w-name" maxlength="30" value="${esc(w.name || '')}" placeholder="for example: London morning"></label>
+      <label class="field">Name <input type="text" class="w-name" maxlength="30" value="${esc(w.name || '')}" placeholder="London morning"></label>
       <div class="field">Days<div class="checks">${days}</div></div>
       <div class="wtimes"><label class="field">From <input type="time" class="w-start" value="${esc(w.start)}"></label>
         <label class="field">To <input type="time" class="w-end" value="${esc(w.end)}"></label></div>
