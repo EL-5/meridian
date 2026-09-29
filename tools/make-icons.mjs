@@ -1,4 +1,4 @@
-// Draws the app icon (a globe with the meridian marked in amber) and writes PNGs.
+// Draws the app icon (an M split by the meridian in amber) and writes PNGs.
 // Run: node tools/make-icons.mjs
 import { deflateSync } from 'node:zlib';
 import { writeFileSync } from 'node:fs';
@@ -24,24 +24,18 @@ function render(size, safe) {
     const dx = x2 - x1, dy = y2 - y1, t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)));
     return Math.hypot(x - (x1 + t * dx), y - (y1 + t * dy));
   };
-  const ang = a => [Math.sin(a), -Math.cos(a)];
+  
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
     let acc = [0, 0, 0];
     for (let sy = 0; sy < SS; sy++) for (let sx = 0; sx < SS; sx++) {
       const X = x + (sx + .5) / SS, Y = y + (sy + .5) / SS;
       const d = Math.hypot(X - c, Y - c);
       let col = BG;
-      const dx = X - c, dy = Y - c, ring = R * 0.86;
-      const band = (f, r, w) => Math.abs(f - 1) * r < w;                        // thin band around an ellipse
-      if (band(d / ring, ring, R * 0.05)) col = INK;                            // globe outline
-      if (d < ring) {
-        const e = Math.hypot(dx / (R * 0.42), dy / ring);
-        if (band(e, R * 0.42, R * 0.04)) col = INK;                             // the side meridians, drawn as one ellipse
-        if (Math.abs(dy) < R * 0.04) col = INK;                                 // equator
-      }
-      if (Math.abs(dx) < R * 0.07 && Math.abs(dy) < ring + R * 0.09) col = AMBER; // the meridian, sticking out past the globe
-      if (Math.hypot(dx, dy) < R * 0.17) col = BG;                              // gap around the marker
-      if (Math.hypot(dx, dy) < R * 0.11) col = AMBER;                           // "now" marker where it crosses the equator
+      // Work in units where the artwork's half-width is 1: an "M" whose middle valley is split by the meridian.
+      const u = (X - c) / R, v = (Y - c) / R, w = 0.105;
+      if (seg(u, v, -0.5, 0.52, -0.5, -0.52) < w || seg(u, v, 0.5, 0.52, 0.5, -0.52) < w ||
+          seg(u, v, -0.5, -0.52, 0, 0.14) < w || seg(u, v, 0.5, -0.52, 0, 0.14) < w) col = INK;
+      if (Math.abs(u) < 0.055 && Math.abs(v) < 0.8) col = AMBER;                 // the meridian, running past the letter
       acc = acc.map((v, i) => v + col[i]);
     }
     px.set(acc.map(v => Math.round(v / (SS * SS))), (y * size + x) * 3);
