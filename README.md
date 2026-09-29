@@ -72,7 +72,7 @@ Then open `http://localhost:5177` in Chrome or Edge, and use **Install app** (to
 
 The app is a static site plus one small function, and is set up for Vercel (`vercel.json`).
 - **What is published.** `tools/build-site.mjs` copies only the app files into `_site/` (not the tests or tools). `vercel.json` publishes that folder and rewrites `/calendar.json` to the function `api/calendar.mjs`.
-- **Deploying.** From this folder: `vercel deploy --prod`. The first run asks you to create or link a project. Deploys are manual unless you connect the repository to the project in the host's dashboard.
+- **Deploying.** With the repository connected to the host project, every push to `main` publishes automatically. A manual deploy also works: from this folder, `vercel deploy --prod` (the first run asks you to create or link a project).
 - **Any other static host** works too, but `/calendar.json` then needs a server-side source. Without one the app runs normally and the news panel says the calendar is not loaded.
 - **GitHub Pages** is not used: the calendar needs a server-side fetch, and the feed cannot be called from a browser.
 - **Privacy.** The journal, settings and any Twelve Data key are stored only in the browser on each device. The site itself holds no personal data.
