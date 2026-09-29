@@ -1,6 +1,6 @@
 # Forex Trading Sessions — GMT / Ghana Time
 
-## The app (Session Clock)
+## The app (Meridian)
 
 An installable web app in this folder. It shows which sessions are open, says how busy the market is right now in plain words, warns about bank holidays, rollover and the weekend close, and can show how a session is going.
 

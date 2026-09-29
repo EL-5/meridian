@@ -1,6 +1,6 @@
 // Caches the app itself so it opens offline. Market data is never cached here:
 // it is cross-origin, so this worker does not touch it.
-const CACHE = 'session-clock-v20';   // bump when shipping changes so old copies are dropped
+const CACHE = 'meridian-v21';   // bump when shipping changes so old copies are dropped
 const SHELL = ['./', 'index.html', 'style.css', 'logic.js', 'glossary.js', 'journal.js', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 

@@ -1,7 +1,7 @@
 {
-  "name": "Session Clock",
-  "short_name": "Sessions",
-  "description": "Live forex session clock: which markets are open, what to trade now, and how the session is going.",
+  "name": "Meridian",
+  "short_name": "Meridian",
+  "description": "Meridian, a live forex session clock: which markets are open, what to trade now, and how the session is going.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

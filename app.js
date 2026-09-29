@@ -838,12 +838,13 @@
   const stamp = () => new Date().toISOString().slice(0, 10);
   function jExportCsv() {
     if (!journal.trades.length) return jStatus('There are no trades to export yet.', 'bad');
-    jDownload('session-clock-journal-' + stamp() + '.csv', '﻿' + FXJ.toCsv(journal.trades), 'text/csv;charset=utf-8');   // the BOM makes Excel read accents correctly
+    jDownload('meridian-journal-' + stamp() + '.csv', '﻿' + FXJ.toCsv(journal.trades), 'text/csv;charset=utf-8');   // the BOM makes Excel read accents correctly
     jStatus('CSV exported (' + journal.trades.length + ' trades).', 'ok');
   }
   function jBackup() {
     if (!journal.trades.length) return jStatus('There are no trades to back up yet.', 'bad');
-    jDownload('session-clock-journal-' + stamp() + '.json', JSON.stringify({ app: 'session-clock-journal', version: 1, exportedAt: new Date().toISOString(), trades: journal.trades }, null, 1), 'application/json');
+    // The app id inside a backup stays 'session-clock-journal' so backups made before the rename still restore.
+    jDownload('meridian-journal-' + stamp() + '.json', JSON.stringify({ app: 'session-clock-journal', version: 1, exportedAt: new Date().toISOString(), trades: journal.trades }, null, 1), 'application/json');
     S.journal.lastBackup = Date.now(); S.journal.sinceBackup = 0; save();
     jStatus('Backup saved (' + journal.trades.length + ' trades). Keep the file somewhere safe.', 'ok');
     renderJournal();
@@ -1330,7 +1331,7 @@
     if (minute !== lastMinute) { lastMinute = minute; refreshLive(); renderOverview(); paintCalStatus(); }
     if (S.apiKey && !document.hidden) { if (S.selected) fetchFeed(S.selected, false); if (hk) fetchFeed(hk, false); }
 
-    document.title = a.word + ' · Session Clock';
+    document.title = a.word + ' · Meridian';
   }
 
   // ---- terms: tap an underlined word for its meaning ---------------------------

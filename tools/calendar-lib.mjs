@@ -34,7 +34,7 @@ export async function fetchCalendar(fetchImpl = fetch) {
   const rows = [];
   let got = 0;
   for (const url of FEEDS) {
-    const res = await fetchImpl(url, { headers: { 'User-Agent': 'SessionClock/1.0 (personal use)', Accept: 'application/json' } });
+    const res = await fetchImpl(url, { headers: { 'User-Agent': 'Meridian/1.0 (personal use)', Accept: 'application/json' } });
     if (res.status === 404) continue;                                // next week is not published yet
     if (!res.ok) throw new Error(`calendar feed answered HTTP ${res.status}`);
     const text = await res.text();

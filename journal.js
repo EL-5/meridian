@@ -126,7 +126,7 @@
   }
   // Merge a backup into the current journal. Trades with an id already present are skipped.
   function mergeBackup(current, json, newId) {
-    if (!json || json.app !== 'session-clock-journal' || !Array.isArray(json.trades)) return { error: 'This is not a Session Clock journal backup.' };
+    if (!json || json.app !== 'session-clock-journal' || !Array.isArray(json.trades)) return { error: 'This is not a Meridian journal backup.' };
     const ids = new Set(current.map(t => t.id));
     const added = [];
     let skipped = 0, rejected = 0;

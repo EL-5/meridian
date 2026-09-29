@@ -70,6 +70,6 @@ const server = createServer(async (req, res) => {
   }
 });
 server.listen(port, host, () => {
-  log(`Session Clock on http://${host === '0.0.0.0' ? '<this-computer-ip>' : 'localhost'}:${port}`);
+  log(`Meridian on http://${host === '0.0.0.0' ? '<this-computer-ip>' : 'localhost'}:${port}`);
   ageOfCalendar().then(a => { if (a > FRESH_MS) refresh(); });
 });
