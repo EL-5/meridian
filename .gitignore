@@ -1,0 +1,6 @@
+calendar.json
+calendar.json.tmp
+*.tmp
+node_modules/
+.claude/
+_site/

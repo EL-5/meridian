@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Session Clock</title>
+<meta name="description" content="Live forex session clock: which markets are open, what to trade now, and every trading term explained.">
+<meta name="theme-color" content="#14130f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sessions">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app" class="level-beginner">
+  <header class="top">
+    <div class="brand">
+      <h1>Session Clock</h1>
+      <div class="zone" id="zone"></div>
+    </div>
+    <div class="tools">
+      <div class="seg" role="radiogroup" aria-label="How much detail to show">
+        <span class="seglabel" aria-hidden="true">View</span>
+        <button type="button" role="radio" data-level="beginner" aria-checked="true">Beginner</button>
+        <button type="button" role="radio" data-level="experienced" aria-checked="false">Experienced</button>
+      </div>
+      <button type="button" id="btn-settings">Settings</button>
+    </div>
+  </header>
+
+  <div class="tabrow">
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="t-now" data-tab="now" aria-selected="true" aria-controls="tab-now">Now</button>
+      <button type="button" role="tab" id="t-calc" data-tab="calc" aria-selected="false" aria-controls="tab-calc">Calculator</button>
+    <button type="button" role="tab" id="t-journal" data-tab="journal" aria-selected="false" aria-controls="tab-journal">Journal</button>
+    <button type="button" role="tab" id="t-start" data-tab="start" aria-selected="false" aria-controls="tab-start">Start here</button>
+      <button type="button" role="tab" id="t-glossary" data-tab="glossary" aria-selected="false" aria-controls="tab-glossary">Glossary</button>
+    </nav>
+    <div class="utils">
+      <button type="button" class="plain" id="btn-install" hidden>Install app</button>
+      <button type="button" class="plain" id="btn-float" hidden>Float on top</button>
+      <button type="button" class="plain" id="btn-compact" aria-pressed="false">Compact</button>
+    </div>
+  </div>
+
+  <!-- ================= NOW ================= -->
+  <div id="tab-now" role="tabpanel" aria-labelledby="t-now">
+    <div class="firstrun" id="firstrun" hidden>
+      <span>New to forex? <button type="button" class="linklike" data-go="start">Read Start here</button>, a two-minute guide. Tap any <span class="termdemo">underlined word</span> for a plain-English meaning.</span>
+      <button type="button" class="plain" id="firstrun-x" aria-label="Dismiss">Dismiss</button>
+    </div>
+
+    <div class="grid">
+      <section class="left">
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="date" id="date"></div>
+        <div class="chartclock" id="chartclock" hidden></div>
+
+        <section class="answer" id="answer" data-level="quiet" aria-live="polite">
+          <div class="kicker">How busy is the market?</div>
+          <div class="alabel" id="a-label"></div>
+          <div class="atag" id="a-tag"></div>
+          <p class="areason" id="a-reason"></p>
+          <ul class="anotes" id="a-notes"></ul>
+          <p class="ameaning only-beg" id="a-meaning"></p>
+          <div class="livebox" id="a-live"></div>
+
+          <dl class="gauges" id="gauges"></dl>
+
+          <div class="scalewrap">
+            <div class="scale" id="scale" role="img">
+              <span data-l="closed">Closed</span><span data-l="quiet">Quiet</span><span data-l="steady">Steady</span><span data-l="good">Good</span><span data-l="peak">Peak</span>
+            </div>
+            <div class="scalecap only-beg">Where the market is right now, from closed to busiest.</div>
+          </div>
+
+
+          <ul class="pairs compact-only" id="a-pairs"></ul>
+        </section>
+
+        <details class="card pairsout" id="pairsout">
+          <summary>Best pairs for the next few hours</summary>
+          <div class="card-body">
+            <div class="ctl-row">
+              <label>Look ahead <select id="po-hours"><option value="1">1 hour</option><option value="2">2 hours</option><option value="4">4 hours</option></select></label>
+              <label>Pairs <select id="po-view"><option value="all">All pairs</option><option value="mine">My pairs</option></select></label>
+            </div>
+            <p class="hint" id="po-window"></p>
+            <ul id="po-list"></ul>
+            <p><button type="button" class="plain" id="po-more" hidden></button></p>
+            <p class="hint" id="po-how"></p>
+          </div>
+        </details>
+      </section>
+
+      <section class="right">
+        <div class="coming" id="coming"></div>
+
+        <section class="mywin" id="mywin" aria-live="polite">
+          <h2 class="sect">My trading window</h2>
+          <div id="mywin-body"></div>
+        </section>
+
+        <section class="news" id="news" aria-live="polite">
+          <div class="newshead">
+            <h2 class="sect">News, next 24 hours</h2>
+            <div class="seg small" role="radiogroup" aria-label="Which news to show" id="news-imp">
+              <button type="button" role="radio" data-imp="high" aria-checked="true">High</button>
+              <button type="button" role="radio" data-imp="medium" aria-checked="false">High and medium</button>
+              <button type="button" role="radio" data-imp="all" aria-checked="false">All</button>
+            </div>
+          </div>
+          <ul id="news-list"></ul>
+          <p><button type="button" class="plain" id="news-more" hidden></button></p>
+          <p class="hint" id="news-status"></p>
+        </section>
+
+        <h2 class="sect">The four sessions</h2>
+        <div class="sessions" id="sessions" role="group" aria-label="Sessions. Select one for an overview."></div>
+
+        <section class="overview" id="overview" aria-live="polite"></section>
+
+        <section class="timeline">
+          <h2 class="sect">Today in your time</h2>
+          <div id="rows"></div>
+          <div class="ticks"><span></span><div id="ticks"></div></div>
+          <p class="hint only-beg">Filled blocks are hours when that market is open. The amber line is the time now.</p>
+        </section>
+
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= CALCULATOR ================= -->
+  <div id="tab-calc" role="tabpanel" aria-labelledby="t-calc" hidden>
+    <section class="calc">
+      <h2 class="pagetitle">Position size</h2>
+      <p class="lead">Work out how many <button type="button" class="term" data-t="lot">lots</button> to trade, so that if your <button type="button" class="term" data-t="stop-loss-sl">stop-loss</button> is hit you lose only the amount you decided to risk.</p>
+
+      <div class="calc-grid">
+        <form class="calc-in" id="calc-form" autocomplete="off">
+          <fieldset>
+            <legend>1. Your account</legend>
+            <label class="field">Balance
+              <input type="text" id="c-balance" inputmode="decimal" placeholder="for example 1000">
+            </label>
+            <label class="field">Account currency
+              <input type="text" id="c-ccy" list="c-ccys" maxlength="3" spellcheck="false" placeholder="USD">
+              <datalist id="c-ccys">
+                <option value="USD"><option value="EUR"><option value="GBP"><option value="JPY"><option value="AUD"><option value="NZD">
+                <option value="CAD"><option value="CHF"><option value="CNY"><option value="SGD"><option value="ZAR"><option value="INR"><option value="NGN"><option value="KES"><option value="GHS">
+              </datalist>
+            </label>
+            <label class="field">Risk per trade, as a percent of your balance
+              <input type="text" id="c-risk" inputmode="decimal" placeholder="1">
+              <span class="hint">Many traders use 1 to 2 percent. This is the most you accept losing if the stop-loss is hit. It is your choice, not advice.</span>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>2. The trade</legend>
+            <label class="field">Pair
+              <select id="c-pair"></select>
+            </label>
+            <label class="field"><span id="c-stop-label">Stop-loss distance in pips</span>
+              <input type="text" id="c-stop" inputmode="decimal" placeholder="for example 25">
+              <span class="hint" id="c-stop-hint">How far from your entry price the stop-loss sits.</span>
+            </label>
+            <label class="field">Buy or sell
+              <select id="c-dir">
+                <option value="">Not decided yet</option>
+                <option value="buy">Buy</option>
+                <option value="sell">Sell</option>
+              </select>
+            </label>
+            <label class="field">Entry price <span class="opt">optional</span>
+              <span class="withbtn"><input type="text" id="c-entry" inputmode="decimal" placeholder="needed for margin and price levels"><button type="button" id="c-entry-live" hidden>Use live price</button></span>
+              <span class="hint" id="c-entry-status"></span>
+            </label>
+            <label class="field"><span id="c-tp-label">Take-profit distance in pips</span> <span class="opt">optional</span>
+              <input type="text" id="c-tp" inputmode="decimal" placeholder="for the reward and reward-to-risk">
+            </label>
+            <label class="field"><span id="c-spread-label">Spread in pips</span> <span class="opt">optional</span>
+              <input type="text" id="c-spread" inputmode="decimal" placeholder="your broker's current spread">
+              <span class="hint">When a stop-loss is hit the spread has already cost you, so it is counted as extra risk.</span>
+            </label>
+            <div class="field" id="c-rate-wrap" hidden>
+              <label for="c-rate"><span id="c-rate-label">Exchange rate</span></label>
+              <span class="withbtn"><input type="text" id="c-rate" inputmode="decimal" placeholder="today's rate"><button type="button" id="c-rate-live" hidden>Use live rate</button></span>
+              <span class="hint" id="c-rate-hint"></span>
+            </div>
+          </fieldset>
+
+          <details class="adv">
+            <summary>Account details that vary by broker</summary>
+            <p class="hint">Check these in your trading account. The defaults are common, not guaranteed.</p>
+            <label class="field">Leverage
+              <select id="c-lev">
+                <option value="0">Don't show margin</option>
+                <option value="30">1:30</option><option value="50">1:50</option><option value="100">1:100</option>
+                <option value="200">1:200</option><option value="500">1:500</option><option value="1000">1:1000</option><option value="2000">1:2000</option>
+              </select>
+            </label>
+            <label class="field">Smallest lot allowed
+              <input type="text" id="c-minlot" inputmode="decimal" placeholder="0.01">
+            </label>
+            <label class="field">Lot step (the smallest change in lot size)
+              <input type="text" id="c-step" inputmode="decimal" placeholder="0.01">
+            </label>
+            <label class="field" id="c-gold-wrap" hidden>Gold contract size (ounces in one lot)
+              <input type="text" id="c-gold" inputmode="decimal" placeholder="100">
+            </label>
+          </details>
+        </form>
+
+        <section class="calc-out" id="calc-out" aria-live="polite"></section>
+      </div>
+
+      <p class="fine">An estimate. Your platform's own calculator, your account's contract size, minimum lot and leverage, and the price at the moment of execution decide what really happens. Not trading advice.</p>
+    </section>
+  </div>
+
+  <!-- ================= JOURNAL ================= -->
+  <div id="tab-journal" role="tabpanel" aria-labelledby="t-journal" hidden>
+    <section class="jr">
+      <h2 class="pagetitle">Journal</h2>
+      <p class="lead" id="jr-lead"></p>
+      <div class="jr-actions">
+        <button type="button" id="jr-add">Log a trade</button>
+        <button type="button" class="plain" id="jr-csv">Export CSV</button>
+        <button type="button" class="plain" id="jr-backup">Back up</button>
+        <button type="button" class="plain" id="jr-restore">Restore</button>
+        <input type="file" id="jr-file" accept=".json,application/json" hidden>
+      </div>
+      <div class="note jr-banner" id="jr-banner" hidden></div>
+      <p class="keystatus" id="jr-status" role="status"></p>
+      <div id="jr-body"></div>
+      <p class="fine">Your journal is stored only in this browser, on this device. Clearing site data would erase it, so back it up now and then. Nothing is sent anywhere. Not trading advice.</p>
+    </section>
+  </div>
+
+  <!-- ================= START HERE ================= -->
+  <div id="tab-start" role="tabpanel" aria-labelledby="t-start" hidden>
+    <article class="prose">
+      <h2 class="pagetitle">Start here</h2>
+      <p class="lead">This app tells you <b>when</b> the forex market is busy, and <b>which pairs</b> are most active. It does not tell you whether to buy or sell, or whether now is a good moment to trade.</p>
+
+      <h3>The market never sleeps, but it does get quiet</h3>
+      <p>Forex is traded around the clock from Monday to Friday. It follows the sun across four financial centres: <b>Sydney, Tokyo, London and New York</b>. When more centres are open, more people are trading. More people trading usually means lower costs and more movement.</p>
+
+      <h3>The five levels</h3>
+      <p>The big word on the Now tab is one of five levels. Nothing here predicts whether a trade will win. The levels describe how busy the market is and how much it costs to trade.</p>
+      <table class="lv">
+        <thead><tr><th>Level</th><th>What is open</th><th>What it means</th></tr></thead>
+        <tbody>
+          <tr><td><b class="lv-peak">Peak</b></td><td>London and New York</td><td>Busiest time. Lowest costs. Prices move the most, and losses can come as fast as wins.</td></tr>
+          <tr><td><b>Good</b></td><td>London, or Tokyo and London</td><td>Plenty of activity. Costs are low.</td></tr>
+          <tr><td><b>Steady</b></td><td>Only Tokyo, or only New York</td><td>Slower. Prices move less.</td></tr>
+          <tr><td><b>Quiet</b></td><td>Only Sydney, or nothing</td><td>Few traders. Costs are higher. Many people wait.</td></tr>
+          <tr><td><b>Closed</b></td><td>Weekend</td><td>No trading until Sunday evening.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>A simple way to use it</h3>
+      <ol class="steps">
+        <li><b>Look at the big word.</b> If it says Peak or Good, activity is high. If it says Quiet, many traders wait.</li>
+        <li><b>Look at "Most active pairs now".</b> These are the pairs with the most activity right now. Each one has a short note on what it is like. Busy is not the same as safe.</li>
+        <li><b>Read any amber warning.</b> It appears for bank holidays, the daily rollover at 5 pm New York, Wednesday's triple swap, the weekend close, and when today is running busier or quieter than the clock suggests. Costs rise and prices can jump.</li>
+        <li><b>Pick one session to study.</b> Tap a session in the list to see how it is going: whether it is busier or quieter than usual.</li>
+      </ol>
+
+      <h3>Which view should I use?</h3>
+      <dl class="pair2">
+        <dt>Beginner</dt><dd>Plain words, short explanations, and underlined terms you can tap to learn what they mean.</dd>
+        <dt>Experienced</dt><dd>The same facts in trader language: liquidity, spread and volatility levels, overlaps and a scored ranking of the pairs.</dd>
+      </dl>
+      <p>Switch any time with the <b>View</b> control at the top. The Glossary is the same in both.</p>
+
+      <h3>If you trade on Exness</h3>
+      <ul class="plainlist">
+        <li><b>Your MetaTrader clock.</b> Exness says its MT4 and MT5 platforms run on GMT+0 (UTC+0) and the time cannot be changed. This app is set up for that, so chart times match the Exness terminal.</li>
+        <li><b>TradingView is different.</b> Its clock follows the timezone you choose for the chart. In TradingView, right-click the time axis and pick <b>UTC</b> so it matches Exness.</li>
+        <li><b>Daily and 4-hour candles</b> on MT4 and MT5 are cut by server time, so they can look different from the same candles on TradingView.</li>
+        <li><b>Market week.</b> The Now tab shows when the Exness forex week closes on Friday and reopens on Sunday. These come from Exness's published schedule, which moves by one hour with New York daylight saving. Confirm the exact times for your account in the Exness app.</li>
+      </ul>
+
+      <h3>Two things to know before real money</h3>
+      <ul class="plainlist">
+        <li>Regulators report that most people who trade forex with a broker lose money. Practise on a <button type="button" class="term" data-t="demo-account">demo account</button> first.</li>
+        <li>Always decide how much you can lose <em>before</em> you open a trade, and set a <button type="button" class="term" data-t="stop-loss-sl">stop-loss</button>.</li>
+      </ul>
+
+      <p class="cta"><button type="button" data-go="glossary">Open the glossary</button> <button type="button" data-go="now">Back to Now</button></p>
+      <p class="fine">Session hours are a convention, not official exchange hours. Nothing here is trading advice, and this app does not connect to your broker or place trades.</p>
+    </article>
+  </div>
+
+  <!-- ================= GLOSSARY ================= -->
+  <div id="tab-glossary" role="tabpanel" aria-labelledby="t-glossary" hidden>
+    <section class="gl">
+      <h2 class="pagetitle">Glossary</h2>
+      <p class="lead" id="gl-lead"></p>
+
+      <div class="gl-controls">
+        <label class="gl-search">
+          <span class="vh">Search terms</span>
+          <input type="search" id="gl-q" placeholder="Search, for example spread or margin" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="seg gl-levels" role="group" aria-label="Filter by level" id="gl-levels"></div>
+        <label class="gl-cat">
+          <span class="vh">Filter by topic</span>
+          <select id="gl-cat"></select>
+        </label>
+      </div>
+
+      <div class="gl-start" id="gl-start">
+        <div class="kicker">If you only learn eight things</div>
+        <ul class="chiplist" id="gl-start-list"></ul>
+      </div>
+
+      <div class="gl-count" id="gl-count" aria-live="polite"></div>
+      <div id="gl-list"></div>
+    </section>
+  </div>
+
+  <footer class="foot only-full">Not trading advice. This app does not connect to your broker or place trades.</footer>
+</div>
+
+<div class="floating-note" id="floating-note" hidden>The clock is floating in its own window. Close that window to bring it back here.</div>
+
+<dialog id="win-dialog">
+  <form class="sheet" id="win-form" autocomplete="off">
+    <header>
+      <h2>My trading hours</h2>
+      <button type="button" class="plain" id="win-cancel">Cancel</button>
+    </header>
+    <p class="hint">Times are in your own clock (<span id="win-tz"></span>). A window can cross midnight, for example 22:00 to 02:00, and belongs to the day it starts. They are wall-clock times, so they stay at the same hour when clocks change.</p>
+    <div id="win-rows"></div>
+    <div class="inline winbtns">
+      <button type="button" id="win-add">Add a window</button>
+    </div>
+    <p class="hint">Or start from today's real times (edit them when clocks change):</p>
+    <div class="winpresets">
+      <button type="button" class="plain" id="win-preset-overlap"></button>
+      <button type="button" class="plain" id="win-preset-london"></button>
+    </div>
+    <p class="keystatus bad" id="win-error" role="alert"></p>
+    <div class="ts-actions">
+      <button type="submit">Save my hours</button>
+      <button type="button" class="plain" id="win-clear">Remove all windows</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="jr-dialog">
+  <form class="sheet" id="jr-form" autocomplete="off">
+    <header>
+      <h2 id="jr-form-title">Log a trade</h2>
+      <button type="button" class="plain" id="jr-cancel">Cancel</button>
+    </header>
+    <label class="field">Pair <select id="j-pair"></select></label>
+    <label class="field">Buy or sell
+      <select id="j-dir"><option value="buy">Buy</option><option value="sell">Sell</option></select>
+    </label>
+    <label class="field">Opened <input type="datetime-local" id="j-opened"></label>
+    <label class="field">Status
+      <select id="j-status"><option value="closed">Closed</option><option value="open">Still open</option></select>
+    </label>
+    <div id="j-closed-wrap">
+      <label class="field">Closed <input type="datetime-local" id="j-closedat"></label>
+      <label class="field">Result in <span id="j-ccy-label">USD</span>. Use a minus sign for a loss.
+        <input type="text" id="j-result" inputmode="decimal" placeholder="for example 12.50 or -8.00">
+        <span class="hint">Copy the profit or loss your platform reports, including fees and swap.</span>
+      </label>
+    </div>
+    <label class="field">Account currency <input type="text" id="j-ccy" maxlength="3" spellcheck="false" placeholder="USD"></label>
+    <label class="field">Money you planned to risk <span class="opt">optional</span>
+      <span class="withbtn"><input type="text" id="j-risk" inputmode="decimal" placeholder="gives the R multiple"><button type="button" id="j-fromcalc" hidden>Fill from calculator</button></span>
+      <span class="hint">The most you were willing to lose on this trade. It turns the result into an R multiple, so trades of different sizes can be compared.</span>
+    </label>
+    <label class="field">Lots <span class="opt">optional</span> <input type="text" id="j-lots" inputmode="decimal"></label>
+    <label class="field">Entry price <span class="opt">optional</span> <input type="text" id="j-entry" inputmode="decimal"></label>
+    <label class="field">Stop-loss price <span class="opt">optional</span> <input type="text" id="j-stop" inputmode="decimal"></label>
+    <label class="field">Exit price <span class="opt">optional</span> <input type="text" id="j-exit" inputmode="decimal"></label>
+    <label class="field">Result in pips <span class="opt">optional</span> <input type="text" id="j-pips" inputmode="decimal" placeholder="use a minus sign for a loss"></label>
+    <label class="field">Did you follow your plan?
+      <select id="j-plan"><option value="">Not recorded</option><option value="yes">Yes</option><option value="partly">Partly</option><option value="no">No</option></select>
+    </label>
+    <label class="field">Setup <span class="opt">optional</span>
+      <input type="text" id="j-setup" list="j-setups" maxlength="60" placeholder="for example: London breakout">
+      <datalist id="j-setups"></datalist>
+    </label>
+    <label class="field">Notes <span class="opt">optional</span> <textarea id="j-notes" rows="3" maxlength="2000" placeholder="Why you took it, how you felt, what you would change"></textarea></label>
+    <p class="keystatus bad" id="j-error" role="alert"></p>
+    <div class="ts-actions">
+      <button type="submit">Save trade</button>
+      <button type="button" class="plain" id="jr-cancel2">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="term-sheet" class="sheetdlg">
+  <div class="sheet">
+    <div class="kicker" id="ts-level"></div>
+    <h2 class="ts-term" id="ts-term"></h2>
+    <p class="ts-short" id="ts-short"></p>
+    <p class="ts-long" id="ts-long"></p>
+    <p class="ts-ex" id="ts-ex" hidden></p>
+    <div class="ts-actions">
+      <button type="button" id="ts-open">See in glossary</button>
+      <button type="button" class="plain" id="ts-close">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="settings">
+  <form method="dialog" class="sheet">
+    <header>
+      <h2>Settings</h2>
+      <button type="submit" class="plain" aria-label="Close settings">Close</button>
+    </header>
+
+    <fieldset>
+      <legend>Alerts</legend>
+      <label class="check"><input type="checkbox" id="s-sound"> Play a sound when a session opens</label>
+      <div class="inline">
+        <button type="button" id="s-test">Test sound</button>
+        <span class="hint">Each session has its own note: Sydney C, Tokyo D, London E, New York G.</span>
+      </div>
+      <label class="check"><input type="checkbox" id="s-notify"> Show a notification when a session opens</label>
+      <p class="hint" id="s-notify-hint"></p>
+      <label class="field">Warn me before a session opens
+        <select id="s-heads">
+          <option value="0">Don't warn me</option>
+          <option value="5">5 minutes before</option>
+          <option value="10">10 minutes before</option>
+          <option value="15">15 minutes before</option>
+        </select>
+      </label>
+      <label class="field">Warn me before my trading window starts
+        <select id="s-winlead">
+          <option value="0">Don't warn me</option>
+          <option value="5">5 minutes before</option>
+          <option value="10">10 minutes before</option>
+          <option value="15">15 minutes before</option>
+          <option value="30">30 minutes before</option>
+        </select>
+      </label>
+      <div class="field">Alert me for
+        <div class="checks" id="s-alerts"></div>
+      </div>
+      <p class="hint">Alerts only work while this app or tab stays open. A closed app cannot alert you.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Economic calendar</legend>
+      <label class="field">Warn me before high-impact news
+        <select id="s-newslead">
+          <option value="0">Don't warn me</option>
+          <option value="5">5 minutes before</option>
+          <option value="10">10 minutes before</option>
+          <option value="15">15 minutes before</option>
+          <option value="30">30 minutes before</option>
+        </select>
+      </label>
+      <div class="field">News for these currencies
+        <div class="checks" id="s-newsccy"></div>
+      </div>
+      <label class="field">Calendar file address
+        <input type="text" id="s-calurl" autocomplete="off" spellcheck="false" placeholder="calendar.json">
+      </label>
+      <div class="inline"><button type="button" id="s-calreload">Reload calendar</button></div>
+      <p class="keystatus" id="s-calstatus" role="status"></p>
+      <p class="hint">News warnings use the same sound and notification settings as session alerts. The calendar comes from a public feed that the app's own server fetches for you (run <b>node tools/serve.mjs</b>). Leave the address as calendar.json unless you host the file somewhere else. This feed is unofficial, and if it stops working the app says so and falls back to its fixed daily events.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Pairs I trade</legend>
+      <p class="hint">Optional. Tick the pairs you actually trade, then choose "My pairs" in the ranking on the Now tab.</p>
+      <div class="checks pairchecks" id="s-mypairs"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>My broker and chart time</legend>
+      <label class="field">Broker
+        <select id="s-broker">
+          <option value="exness">Exness (MT4 and MT5 time, UTC+0)</option>
+          <option value="other">Another broker, or TradingView</option>
+        </select>
+      </label>
+      <label class="field" id="s-offset-wrap">Time shown on my chart
+        <select id="s-offset"></select>
+      </label>
+      <p class="hint" id="s-broker-hint"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Price data for the session overview</legend>
+      <label class="field">Twelve Data API key
+        <input type="password" id="s-key" autocomplete="off" spellcheck="false" placeholder="Paste your key">
+      </label>
+      <div class="inline keyrow">
+        <button type="button" id="s-keytest">Test key</button>
+        <button type="button" class="plain" id="s-keyclear">Remove key</button>
+      </div>
+      <p class="keystatus" id="s-keystatus" role="status">No key added.</p>
+      <p class="hint">Optional. Without a key the app still shows session times and pairs. With a free key from twelvedata.com, the overview also shows how each pair has moved during the session. The app tests the key as soon as you paste it. It is stored only on this device and is sent only to Twelve Data. This app cannot read prices from Exness, which is why it uses Twelve Data.</p>
+    </fieldset>
+  </form>
+</dialog>
+
+<script src="logic.js"></script>
+<script src="glossary.js"></script>
+<script src="journal.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
