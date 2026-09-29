@@ -230,10 +230,10 @@
       <h2 class="pagetitle">Journal</h2>
       <p class="lead" id="jr-lead"></p>
       <div class="jr-actions">
-        <button type="button" id="jr-add">Log a trade</button>
-        <button type="button" class="plain" id="jr-csv">Export CSV</button>
-        <button type="button" class="plain" id="jr-backup">Back up</button>
-        <button type="button" class="plain" id="jr-restore">Restore</button>
+        <button type="button" class="primary" id="jr-add">Log a trade</button>
+        <button type="button" id="jr-csv">Export CSV</button>
+        <button type="button" id="jr-backup">Back up</button>
+        <button type="button" id="jr-restore">Restore</button>
         <input type="file" id="jr-file" accept=".json,application/json" hidden>
       </div>
       <div class="note jr-banner" id="jr-banner" hidden></div>
@@ -350,7 +350,7 @@
     </div>
     <p class="keystatus bad" id="win-error" role="alert"></p>
     <div class="ts-actions">
-      <button type="submit">Save my hours</button>
+      <button type="submit" class="primary">Save my hours</button>
       <button type="button" class="plain" id="win-clear">Remove all windows</button>
     </div>
   </form>
@@ -397,7 +397,7 @@
     <label class="field">Notes <span class="opt">optional</span> <textarea id="j-notes" rows="3" maxlength="2000" placeholder="Why you took it, how you felt, what you would change"></textarea></label>
     <p class="keystatus bad" id="j-error" role="alert"></p>
     <div class="ts-actions">
-      <button type="submit">Save trade</button>
+      <button type="submit" class="primary">Save trade</button>
       <button type="button" class="plain" id="jr-cancel2">Cancel</button>
     </div>
   </form>

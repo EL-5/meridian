@@ -692,7 +692,7 @@
       <dl class="cgrid">${cells}</dl>
       ${warn ? `<ul class="anotes calc-warn">${warn}</ul>` : ''}
       <details class="working"${beginner() ? ' open' : ''}><summary>Show the working</summary><ol>${lines}</ol></details>
-      ${r.tooSmall ? '' : '<p><button type="button" id="calc-to-journal">Add this trade to the journal</button></p>'}`;
+      ${r.tooSmall ? '' : '<p><button type="button" class="primary" id="calc-to-journal">Add this trade to the journal</button></p>'}`;
   }
 
   // ---- trading journal ---------------------------------------------------------------------
@@ -901,11 +901,11 @@
     const showBanner = journal.error || S.journal.sinceBackup >= 10 || (!S.journal.lastBackup && n >= 5);
     banner.hidden = !showBanner;
     if (showBanner) banner.innerHTML = journal.error ? `<b>${esc(journal.error)}</b>`
-      : `<b>Back up your journal.</b> It lives only in this browser${S.journal.lastBackup ? ', and you have added or changed ' + S.journal.sinceBackup + ' trades since your last backup' : ', and has never been backed up'}. Use <b>Back up</b> above.`;
+      : `<b>Back up your journal.</b> It lives only in this browser${S.journal.lastBackup ? ', and you have added or changed ' + S.journal.sinceBackup + ' trades since your last backup' : ', and has never been backed up'}. Press the <b>Back up</b> button on this page.`;
 
     const body = $('#jr-body');
     if (!n) {
-      body.innerHTML = `<div class="note"><b>No trades yet.</b> Log your first trade with the button above. Each one is tagged with the session it opened in, and whether high-impact news was close by, so the journal can show which conditions suit you. You can also add a trade straight from the Calculator.</div>`;
+      body.innerHTML = `<div class="note"><p><b>No trades yet.</b> Each trade you log is tagged with the session it opened in, and whether high-impact news was close by, so the journal can show which conditions suit you. You can also add a trade straight from the Calculator.</p><button type="button" class="primary" id="jr-add2">Log your first trade</button></div>`;
       return;
     }
     const s = FXJ.stats(journal.trades), open = journal.trades.filter(t => t.status === 'open').length, c = s.ccy || 'USD';
@@ -981,6 +981,7 @@
     $('#jr-restore').addEventListener('click', () => $('#jr-file').click());
     $('#jr-file').addEventListener('change', e => { jRestore(e.target.files[0]); e.target.value = ''; });
     $('#jr-body').addEventListener('click', e => {
+      if (e.target.closest('#jr-add2')) { jOpenForm(null, null); return; }
       const more = e.target.closest('#jr-more'); if (more) { jShowAll = !jShowAll; renderJournal(); return; }
       const b = e.target.closest('[data-act]'); if (!b) return;
       const id = b.closest('.jt').dataset.id, t = journal.trades.find(x => x.id === id);
@@ -1035,7 +1036,7 @@
       setHTML(el, `<p class="hint">${beginner()
         ? 'Choose the hours you actually plan to trade. The app will tell you when you are inside them, what the market and the news will be doing during them, and warn you before they start.'
         : 'Set your trading hours for a window outlook, a pre-start warning, and a journal tag for trades taken outside them.'}</p>
-        <button type="button" id="win-edit">Set my trading hours</button>`);
+        <button type="button" class="primary" id="win-edit">Set my trading hours</button>`);
       return;
     }
     const inside = !!wn.inside, sp = wn.inside || wn.next;
