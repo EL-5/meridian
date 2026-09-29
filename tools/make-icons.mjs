@@ -1,4 +1,4 @@
-// Draws the app icon (a clock face with four session ticks) and writes PNGs.
+// Draws the app icon (a globe with the meridian marked in amber) and writes PNGs.
 // Run: node tools/make-icons.mjs
 import { deflateSync } from 'node:zlib';
 import { writeFileSync } from 'node:fs';
@@ -31,15 +31,17 @@ function render(size, safe) {
       const X = x + (sx + .5) / SS, Y = y + (sy + .5) / SS;
       const d = Math.hypot(X - c, Y - c);
       let col = BG;
-      if (Math.abs(d - R * 0.86) < R * 0.055) col = INK;                       // ring
-      for (const a of [0, Math.PI / 2, Math.PI, Math.PI * 1.5]) {               // four ticks
-        const [ux, uy] = ang(a);
-        if (seg(X, Y, c + ux * R * 0.62, c + uy * R * 0.62, c + ux * R * 0.76, c + uy * R * 0.76) < R * 0.045) col = INK;
+      const dx = X - c, dy = Y - c, ring = R * 0.86;
+      const band = (f, r, w) => Math.abs(f - 1) * r < w;                        // thin band around an ellipse
+      if (band(d / ring, ring, R * 0.05)) col = INK;                            // globe outline
+      if (d < ring) {
+        const e = Math.hypot(dx / (R * 0.42), dy / ring);
+        if (band(e, R * 0.42, R * 0.04)) col = INK;                             // the side meridians, drawn as one ellipse
+        if (Math.abs(dy) < R * 0.04) col = INK;                                 // equator
       }
-      const [hx, hy] = ang(Math.PI * 0.72), [mx, my] = ang(Math.PI * 0.08);
-      if (seg(X, Y, c, c, c + hx * R * 0.42, c + hy * R * 0.42) < R * 0.06) col = AMBER; // hour hand
-      if (seg(X, Y, c, c, c + mx * R * 0.64, c + my * R * 0.64) < R * 0.045) col = AMBER; // minute hand
-      if (d < R * 0.07) col = INK;
+      if (Math.abs(dx) < R * 0.07 && Math.abs(dy) < ring + R * 0.09) col = AMBER; // the meridian, sticking out past the globe
+      if (Math.hypot(dx, dy) < R * 0.17) col = BG;                              // gap around the marker
+      if (Math.hypot(dx, dy) < R * 0.11) col = AMBER;                           // "now" marker where it crosses the equator
       acc = acc.map((v, i) => v + col[i]);
     }
     px.set(acc.map(v => Math.round(v / (SS * SS))), (y * size + x) * 3);
